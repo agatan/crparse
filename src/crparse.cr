@@ -4,7 +4,7 @@ module Crparse
   extend self
 
   def run(parser, input : String)
-    state = State.new(input, 0)
+    state = State.new(input)
     parser.run(state)
   end
 

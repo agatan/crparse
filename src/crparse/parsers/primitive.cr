@@ -13,9 +13,9 @@ module Crparse::Parsers
 
   class AnyParser < Parser(Char)
     def run(state : State)
-      if state.input.bytesize > state.pos
+      if state.input.bytesize > state.byte_offset
         ch = state.reader.current_char
-        Success.new(ch, state + ch.bytesize)
+        Success.new(ch, state.shift(ch))
       else
         Failure.new("expected any input")
       end
@@ -28,7 +28,7 @@ module Crparse::Parsers
 
   class EOFParser < Parser(Nil)
     def run(state : State)
-      if state.input.bytesize == state.pos
+      if state.input.bytesize == state.byte_offset
         Success.new(nil, state)
       else
         Failure.new("expected EOF")
@@ -46,7 +46,7 @@ module Crparse::Parsers
 
     def run(state : State)
       if state.reader.current_char == @needle
-        Success.new(@needle, state + @needle.bytesize)
+        Success.new(@needle, state.shift(@needle))
       else
         Failure.new("expected #{@needle.inspect}")
       end
@@ -63,7 +63,7 @@ module Crparse::Parsers
 
     def run(state : State)
       if state.string.starts_with?(@needle)
-        Success.new(@needle, state + @needle.bytesize)
+        Success.new(@needle, state.shift(@needle))
       else
         Failure.new("expected #{@needle.inspect}")
       end
