@@ -182,5 +182,28 @@ describe Crparse::Parser do
         raise "#{result.message} at #{result.state.position}"
       end
     end
+
+    it "works even if the input is empty" do
+      parser = Parsers.char('a').sep_by(Parsers.char(','))
+      result = parser.run("").success!
+      result.attribute.should eq [] of Char
+    end
+  end
+
+  describe "#sep_by1" do
+    it "parses sequence of the given parser separated by the given separator" do
+      parser = Parsers.char('a').sep_by1(Parsers.char(','))
+      case result = parser.run("a,a,a,a")
+      when Crparse::Success
+        result.attribute.should eq ['a']*4
+      else
+        raise "#{result.message} at #{result.state.position}"
+      end
+    end
+
+    it "fails if the input is empty" do
+      parser = Parsers.char('a').sep_by1(Parsers.char(','))
+      parser.run("").should be_a Crparse::Failure
+    end
   end
 end

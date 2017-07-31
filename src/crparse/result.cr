@@ -41,12 +41,17 @@ module Crparse
       attr = yield @attribute
       Success.new(attr, @state)
     end
+
+    def success!
+      self
+    end
   end
 
-  class Failure
+  class Failure < Exception
     getter message, state
 
     def initialize(@message : String, @state : State)
+      super(@message)
     end
 
     def position
@@ -55,6 +60,10 @@ module Crparse
 
     def to_s(io)
       io << "#{position}: #{message}"
+    end
+
+    def success!
+      raise self
     end
   end
 end
