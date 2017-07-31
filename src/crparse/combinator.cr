@@ -40,7 +40,7 @@ module Crparse
     def initialize(@first : Parser(T), @second : Parser(U))
     end
 
-    def run(state : State) : Success(T | U) | Failure
+    def run(state : State)
       res = @first.run(state)
       case res
       when Success
@@ -93,6 +93,25 @@ module Crparse
     end
   end
 
+  class CountParser(T) < Parser(Array(T))
+    def initialize(@parser : Parser(T), @n : Int32)
+    end
+
+    def run(state : State) : Success(Array(T)) | Failure
+      attrs = [] of T
+      @n.times do
+        case result = @parser.run(state)
+        when Success
+          attrs << result.attribute
+          state = result.state
+        else
+          return result
+        end
+      end
+      Success.new(attrs, state)
+    end
+  end
+
   class Parser(T)
     def and(r)
       AndParser.new(self, r)
@@ -135,6 +154,10 @@ module Crparse
 
     def many1
       Many1Parser.new(self)
+    end
+
+    def count(n)
+      CountParser.new(self, n)
     end
   end
 end
