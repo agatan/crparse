@@ -171,4 +171,16 @@ describe Crparse::Parser do
       parser.run("").as(Crparse::Failure)
     end
   end
+
+  describe "#sep_by" do
+    it "parses sequence of the given parser separated by the given separator" do
+      parser = Parsers.char('a').sep_by(Parsers.char(','))
+      case result = parser.run("a,a,a,a")
+      when Crparse::Success
+        result.attribute.should eq ['a']*4
+      else
+        raise "#{result.message} at #{result.state.position}"
+      end
+    end
+  end
 end

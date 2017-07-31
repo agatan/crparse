@@ -44,9 +44,9 @@ module Crparse
   end
 
   class Failure
-    getter message
+    getter message, state
 
-    def initialize(@message : String)
+    def initialize(@message : String, @state : State)
     end
   end
 end

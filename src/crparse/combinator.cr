@@ -60,7 +60,11 @@ module Crparse
       when Success
         Success(T?).new(result.attribute, result.state)
       else
-        Success(T?).new(nil, state)
+        if state == result.state
+          Success(T?).new(nil, state)
+        else
+          result
+        end
       end
     end
   end
@@ -112,6 +116,42 @@ module Crparse
     end
   end
 
+  class SepBy1Parser(T, S) < Parser(Array(T))
+    def initialize(@parser : Parser(T), @sep : Parser(S))
+    end
+
+    def run(state : State)
+      attrs = [] of T
+
+      case result = @parser.run(state)
+      when Success
+        attrs << result.attribute
+        state = result.state
+      else
+        return result
+      end
+
+      loop do
+        case result = @sep.run(state)
+        when Success
+          state = result.state
+        else
+          break
+        end
+
+        case result = @parser.run(state)
+        when Success
+          attrs << result.attribute
+          state = result.state
+        else
+          return result
+        end
+      end
+
+      Success.new(attrs, state)
+    end
+  end
+
   class Parser(T)
     def and(r)
       AndParser.new(self, r)
@@ -158,6 +198,20 @@ module Crparse
 
     def count(n)
       CountParser.new(self, n)
+    end
+
+    def sep_by(sep)
+      sep_by1(sep).option.map do |attr|
+        if attr
+          attr
+        else
+          [] of T
+        end
+      end
+    end
+
+    def sep_by1(sep)
+      SepBy1Parser.new(self, sep)
     end
   end
 end

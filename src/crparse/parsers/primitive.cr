@@ -7,7 +7,7 @@ module Crparse::Parsers
     end
 
     def run(state : State)
-      Failure.new(@message)
+      Failure.new(@message, state)
     end
   end
 
@@ -21,7 +21,7 @@ module Crparse::Parsers
         ch = state.reader.current_char
         Success.new(ch, state.shift(ch))
       else
-        Failure.new("expected any input")
+        Failure.new("expected any input", state)
       end
     end
   end
@@ -35,7 +35,7 @@ module Crparse::Parsers
       if state.input.bytesize == state.byte_offset
         Success.new(nil, state)
       else
-        Failure.new("expected EOF")
+        Failure.new("expected EOF", state)
       end
     end
   end
@@ -52,7 +52,7 @@ module Crparse::Parsers
       if state.reader.current_char == @needle
         Success.new(@needle, state.shift(@needle))
       else
-        Failure.new("expected #{@needle.inspect}")
+        Failure.new("expected #{@needle.inspect}", state)
       end
     end
   end
@@ -69,7 +69,7 @@ module Crparse::Parsers
       if state.string.starts_with?(@needle)
         Success.new(@needle, state.shift(@needle))
       else
-        Failure.new("expected #{@needle.inspect}")
+        Failure.new("expected #{@needle.inspect}", state)
       end
     end
   end
@@ -84,11 +84,11 @@ module Crparse::Parsers
 
     def run(state : State)
       reader = state.reader
-      return Failure.new("unexpected EOF") unless reader.has_next?
+      return Failure.new("unexpected EOF", state) unless reader.has_next?
       if @range.includes?(reader.current_char)
         Success.new(reader.current_char, state.shift(reader.current_char))
       else
-        Failure.new("unexpected character #{reader.current_char.inspect}")
+        Failure.new("unexpected character #{reader.current_char.inspect}", state)
       end
     end
   end
