@@ -46,7 +46,11 @@ module Crparse
       when Success
         res
       else
-        @second.run(state)
+        if res.position == state.position
+          @second.run(state)
+        else
+          res
+        end
       end
     end
   end
