@@ -55,6 +55,14 @@ describe Crparse::Parsers do
       result.state.string.should eq "def"
     end
   end
+
+  describe "value" do
+    it "always returns the given value" do
+      result = Parsers.value(1).run("abc").as(Crparse::Success)
+      result.attribute.should eq 1
+      result.state.string.should eq "abc"
+    end
+  end
 end
 
 describe Crparse::Parser do

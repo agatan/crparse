@@ -73,4 +73,17 @@ module Crparse::Parsers
   def self.string(str)
     StringParser.new(str)
   end
+
+  class ValueParser(T) < Parser(T)
+    def initialize(@value : T)
+    end
+
+    def run(state : State)
+      Success.new(@value, state)
+    end
+  end
+
+  def self.value(v)
+    ValueParser.new(v)
+  end
 end
