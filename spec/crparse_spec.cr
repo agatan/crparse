@@ -3,6 +3,12 @@ require "./spec_helper"
 Parsers = Crparse::Parsers
 
 describe Crparse::Parsers do
+  describe "fail" do
+    it "always fails with the given message" do
+      result = Parsers.fail(Char, "failure message").run("").as(Crparse::Failure)
+      result.message.should eq "failure message"
+    end
+  end
   describe "any" do
     it "success to parse any character" do
       parser = Parsers.any

@@ -2,13 +2,17 @@ require "../result"
 require "../parser"
 
 module Crparse::Parsers
-  class FailParser < Parser(Nil)
+  class FailParser(T) < Parser(T)
     def initialize(@message : String)
     end
 
     def run(state : State)
       Failure.new(@message)
     end
+  end
+
+  def self.fail(t : T.class, message) forall T
+    FailParser(T).new(message)
   end
 
   class AnyParser < Parser(Char)
