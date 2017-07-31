@@ -1,5 +1,5 @@
 module Crparse
-  struct Location
+  struct Position
     property? filename : String?
     property byte_offset : Int32, line : Int32, column : Int32
 
@@ -14,9 +14,9 @@ module Crparse
 
     def shift(char)
       if char == '\n'
-        Location.new(@filename, @byte_offset + char.bytesize, @line + 1, 1)
+        Position.new(@filename, @byte_offset + char.bytesize, @line + 1, 1)
       else
-        Location.new(@filename, @byte_offset + char.bytesize, @line, @column + 1)
+        Position.new(@filename, @byte_offset + char.bytesize, @line, @column + 1)
       end
     end
 

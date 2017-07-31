@@ -1,33 +1,33 @@
-require "./location"
+require "./position"
 
 module Crparse
-  record State, input : String, location : Location do
+  record State, input : String, position : Position do
     def initialize(input : String)
-      initialize(input, Location.new)
+      initialize(input, Position.new)
     end
 
     def filename=(filename : String?)
-      location.filename = filename
+      position.filename = filename
     end
 
     def byte_offset
-      location.byte_offset
+      position.byte_offset
     end
 
     def reader
-      Char::Reader.new(input, location.byte_offset)
+      Char::Reader.new(input, position.byte_offset)
     end
 
     def string
-      input.byte_slice(location.byte_offset)
+      input.byte_slice(position.byte_offset)
     end
 
     def shift(char : Char)
-      State.new(input, location.shift(char))
+      State.new(input, position.shift(char))
     end
 
     def shift(str : String)
-      State.new(input, str.each_char.reduce(location) { |loc, char| loc.shift(char) })
+      State.new(input, str.each_char.reduce(position) { |loc, char| loc.shift(char) })
     end
   end
 
