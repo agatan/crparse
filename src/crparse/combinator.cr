@@ -65,12 +65,20 @@ module Crparse
     end
   end
 
-  class ManyParser(T) < Parser(Array(T))
+  class Many1Parser(T) < Parser(Array(T))
     def initialize(@parser : Parser(T))
     end
 
     def run(state : State) : Success(Array(T)) | Failure
       attrs = [] of T
+      case result = @parser.run(state)
+      when Success
+        attrs << result.attribute
+        state = result.state
+      else
+        return result
+      end
+
       loop do
         case result = @parser.run(state)
         when Success
@@ -80,6 +88,7 @@ module Crparse
           break
         end
       end
+
       Success.new(attrs, state)
     end
   end
@@ -115,13 +124,17 @@ module Crparse
     end
 
     def many
-      ManyParser.new(self)
+      many1.option.map do |attr|
+        if attr
+          attr
+        else
+          [] of T
+        end
+      end
     end
 
     def many1
-      (self + many).map do |attr|
-        [attr[0]] + attr[1]
-      end
+      Many1Parser.new(self)
     end
   end
 end
