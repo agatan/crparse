@@ -116,6 +116,13 @@ describe Crparse::Parser do
       result.attribute.should eq "def"
       result.state.string.should eq ""
     end
+
+    it "works if chained" do
+      parser = Parsers.string("abc") >> Parsers.string("def") << Parsers.string("ghi") << Parsers.eof
+      result = parser.run("abcdefghi").success!
+      result.attribute.should eq "def"
+      result.state.string.should eq ""
+    end
   end
 
   describe "#|" do
