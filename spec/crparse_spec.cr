@@ -101,4 +101,29 @@ describe Crparse::Parser do
       result.state.string.should eq "ghi"
     end
   end
+
+  describe "#many" do
+    it "parses sequence of given parser" do
+      parser = Crparse.char('a').many
+      result = parser.run("aaaa").as(Crparse::Success)
+      result.attribute.should eq (['a'] * 4)
+      result.state.string.should eq ""
+      result = parser.run("").as(Crparse::Success)
+      result.attribute.size.should eq 0
+    end
+  end
+
+  describe "#many1" do
+    it "parses sequence of given parser" do
+      parser = Crparse.char('a').many1
+      result = parser.run("aaaa").as(Crparse::Success)
+      result.attribute.should eq (['a'] * 4)
+      result.state.string.should eq ""
+    end
+
+    it "fails if no attributes match the parser" do
+      parser = Crparse.char('a').many1
+      parser.run("").as(Crparse::Failure)
+    end
+  end
 end

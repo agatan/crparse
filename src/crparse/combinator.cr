@@ -51,6 +51,25 @@ module Crparse
     end
   end
 
+  class ManyParser(T) < Parser(Array(T))
+    def initialize(@parser : Parser(T))
+    end
+
+    def run(state : State) : Success(Array(T)) | Failure
+      attrs = [] of T
+      loop do
+        case result = @parser.run(state)
+        when Success
+          attrs << result.attribute
+          state = result.state
+        else
+          break
+        end
+      end
+      Success.new(attrs, state)
+    end
+  end
+
   class Parser(T)
     def and(r)
       AndParser.new(self, r)
@@ -75,6 +94,16 @@ module Crparse
 
     def |(r)
       OrParser.new(self, r)
+    end
+
+    def many
+      ManyParser.new(self)
+    end
+
+    def many1
+      (self + many).map do |attr|
+        [attr[0]] + attr[1]
+      end
     end
   end
 end
