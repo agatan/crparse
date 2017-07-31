@@ -48,18 +48,22 @@ module Crparse
   end
 
   class Failure < Exception
-    getter message, state
+    getter message_without_position, state
 
-    def initialize(@message : String, @state : State)
-      super(@message)
+    def initialize(@message_without_position : String, @state : State)
+      super(@message_without_position)
     end
 
     def position
       @state.position
     end
 
+    def message
+      "#{position}: #{@message_without_position}"
+    end
+
     def to_s(io)
-      io << "#{position}: #{message}"
+      io << message
     end
 
     def success!
