@@ -48,5 +48,13 @@ module Crparse
 
     def initialize(@message : String, @state : State)
     end
+
+    def position
+      @state.position
+    end
+
+    def to_s(io)
+      io << "#{position}: #{message}"
+    end
   end
 end
