@@ -46,6 +46,15 @@ describe Crparse::Parsers do
       result.state.string.should eq "def"
     end
   end
+
+  describe "seq" do
+    it "parses 3 parsers and produce a tuple of 3 attributes" do
+      parser = Parsers.seq(Parsers.char('a'), Parsers.char('b').map { 2 }, Parsers.char('c'))
+      result = Crparse.run(parser, "abcdef").as(Crparse::Success)
+      result.attribute.should eq ({'a', 2, 'c'})
+      result.state.string.should eq "def"
+    end
+  end
 end
 
 describe Crparse::Parser do
