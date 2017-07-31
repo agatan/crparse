@@ -1,4 +1,3 @@
-require "./parser/*"
 require "./result"
 
 module Crparse
