@@ -8,7 +8,7 @@ module Crparse::Parsers
     {% instance_parsers_with_types = (0..index).map { |i| "@t#{i} : Parser(T#{i})".id } %}
     {% attributes = (0..index).map { |i| "attr#{i}".id } %}
 
-    class {{ "Seq#{index+1}Parser".id }}({{ *types }})
+    class {{ "Seq#{index+1}Parser".id }}({{ *types }}) < Parser({ {{ *types }} })
       def initialize({{ *instance_parsers_with_types }})
       end
 

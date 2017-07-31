@@ -86,4 +86,14 @@ module Crparse::Parsers
   def self.value(v)
     ValueParser.new(v)
   end
+
+  class PositionParser < Parser(Position)
+    def run(state : State)
+      Success.new(state.position, state)
+    end
+  end
+
+  def self.position
+    PositionParser.new
+  end
 end

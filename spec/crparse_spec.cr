@@ -63,6 +63,18 @@ describe Crparse::Parsers do
       result.state.string.should eq "abc"
     end
   end
+
+  describe "position" do
+    it "returns the position of current state" do
+      result = Parsers.position.run("abc").as(Crparse::Success)
+      result.attribute.should eq Crparse::Position.new
+      result.state.string.should eq "abc"
+
+      result = Parsers.seq(Parsers.string("abc"), Parsers.position).run("abcdef").as(Crparse::Success)
+      result.attribute.should eq ({"abc", Crparse::Position.new(nil, 3, 1, 4)})
+      result.state.string.should eq "def"
+    end
+  end
 end
 
 describe Crparse::Parser do
