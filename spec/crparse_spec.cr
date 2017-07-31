@@ -61,3 +61,44 @@ describe Crparse::MapParser do
     result.state.string.should eq "def"
   end
 end
+
+describe Crparse::Parser do
+  describe "#+" do
+    it "combine two parsers" do
+      parser = Crparse.string("abc") + Crparse.string("def")
+      result = parser.run("abcdef").as(Crparse::Success)
+      result.attribute.should eq ({"abc", "def"})
+      result.state.string.should eq ""
+    end
+  end
+
+  describe "#<<" do
+    it "discards right hand side attribute" do
+      parser = Crparse.string("abc") << Crparse.string("def")
+      result = parser.run("abcdef").as(Crparse::Success)
+      result.attribute.should eq "abc"
+      result.state.string.should eq ""
+    end
+  end
+
+  describe "#>>" do
+    it "discards right hand side attribute" do
+      parser = Crparse.string("abc") >> Crparse.string("def")
+      result = parser.run("abcdef").as(Crparse::Success)
+      result.attribute.should eq "def"
+      result.state.string.should eq ""
+    end
+  end
+
+  describe "#|" do
+    it "works as `or` parser" do
+      parser = Crparse.string("abc") | Crparse.string("def")
+      result = parser.run("abcdef").as(Crparse::Success)
+      result.attribute.should eq "abc"
+      result.state.string.should eq "def"
+      result = parser.run("defghi").as(Crparse::Success)
+      result.attribute.should eq "def"
+      result.state.string.should eq "ghi"
+    end
+  end
+end
