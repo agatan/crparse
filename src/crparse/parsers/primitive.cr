@@ -78,6 +78,25 @@ module Crparse::Parsers
     StringParser.new(str)
   end
 
+  class RangeParser < Parser(Char)
+    def initialize(@range : Range(Char, Char))
+    end
+
+    def run(state : State)
+      reader = state.reader
+      return Failure.new("unexpected EOF") unless reader.has_next?
+      if @range.includes?(reader.current_char)
+        Success.new(reader.current_char, state.shift(reader.current_char))
+      else
+        Failure.new("unexpected character #{reader.current_char.inspect}")
+      end
+    end
+  end
+
+  def self.range(range)
+    RangeParser.new(range)
+  end
+
   class ValueParser(T) < Parser(T)
     def initialize(@value : T)
     end

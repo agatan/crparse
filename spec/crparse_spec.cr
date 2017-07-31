@@ -53,6 +53,14 @@ describe Crparse::Parsers do
     end
   end
 
+  describe "range" do
+    it "works with digit range" do
+      result = Parsers.range('0'..'9').run("123").as(Crparse::Success)
+      result.attribute.should eq '1'
+      result.state.string.should eq "23"
+    end
+  end
+
   describe "seq" do
     it "parses 3 parsers and produce a tuple of 3 attributes" do
       parser = Parsers.seq(Parsers.char('a'), Parsers.char('b').map { 2 }, Parsers.char('c'))
