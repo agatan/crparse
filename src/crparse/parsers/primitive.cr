@@ -11,7 +11,7 @@ module Crparse::Parsers
     end
   end
 
-  def self.fail(t : T.class, message) forall T
+  def fail(t : T.class, message) forall T
     FailParser(T).new(message)
   end
 
@@ -26,7 +26,7 @@ module Crparse::Parsers
     end
   end
 
-  def self.any
+  def any
     AnyParser.new
   end
 
@@ -40,7 +40,7 @@ module Crparse::Parsers
     end
   end
 
-  def self.eof
+  def eof
     EOFParser.new
   end
 
@@ -57,7 +57,7 @@ module Crparse::Parsers
     end
   end
 
-  def self.char(ch)
+  def char(ch)
     CharParser.new(ch)
   end
 
@@ -74,7 +74,7 @@ module Crparse::Parsers
     end
   end
 
-  def self.string(str)
+  def string(str)
     StringParser.new(str)
   end
 
@@ -93,7 +93,7 @@ module Crparse::Parsers
     end
   end
 
-  def self.range(range)
+  def range(range)
     RangeParser.new(range)
   end
 
@@ -106,7 +106,7 @@ module Crparse::Parsers
     end
   end
 
-  def self.value(v)
+  def value(v)
     ValueParser.new(v)
   end
 
@@ -116,7 +116,7 @@ module Crparse::Parsers
     end
   end
 
-  def self.position
+  def position
     PositionParser.new
   end
 end

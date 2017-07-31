@@ -31,7 +31,7 @@ module Crparse::Parsers
       end
     end
 
-    def self.seq({{ *parsers }})
+    def seq({{ *parsers }})
       {{ "Seq#{index+1}Parser".id }}.new({{ *parsers }})
     end
   {% end %}
