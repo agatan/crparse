@@ -1,6 +1,6 @@
 # crparse
 
-TODO: Write a description here
+Parser Combinator library for Crystal.
 
 ## Installation
 
@@ -16,13 +16,19 @@ dependencies:
 
 ```crystal
 require "crparse"
+
+module MyParser
+  extern self
+  include Crparse::Parsers
+
+  def integer
+    range('0'..'9').many1.map(&.join.to_i)
+  end
+end
+
+p MyParser.integer.run("123").success!.attribute # => 123
 ```
 
-TODO: Write usage instructions here
-
-## Development
-
-TODO: Write development instructions here
 
 ## Contributing
 
@@ -34,4 +40,4 @@ TODO: Write development instructions here
 
 ## Contributors
 
-- [agatan](https://github.com/agatan) agatan - creator, maintainer
+- [agatan](https://github.com/agatan) Naomichi Agata - creator, maintainer
