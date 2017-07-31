@@ -1,8 +1,9 @@
-require "../result"
+require "./result"
+require "./parser"
 
 module Crparse
-  class MapParser(T, U)
-    def initialize(@parser : WrapParser(T), &@block : T -> U)
+  class MapParser(T, U) < Parser(T)
+    def initialize(@parser : Parser(T), &@block : T -> U)
     end
 
     def run(state : State)
@@ -15,7 +16,7 @@ module Crparse
     end
   end
 
-  class AndParser(T, U)
+  class AndParser(T, U) < Parser(Tuple(T, U))
     def initialize(@first : T, @second : U)
     end
 
@@ -35,21 +36,14 @@ module Crparse
     end
   end
 
-  class WrapParser(T)
-    def initialize(@parser : T)
-    end
-
-    def run(state)
-      @parser.run state
-    end
-
+  class Parser(T)
     def and(r)
-      AndParser.new(@parser, r)
+      AndParser.new(self, r)
     end
 
-    def map(&block)
-      block.call "foo"
-      # MapParser.new(self, &blk)
+    def map(&block : T -> _)
+      # block.call "foo"
+      MapParser.new(self, &block)
     end
   end
 end

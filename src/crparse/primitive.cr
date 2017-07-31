@@ -1,7 +1,7 @@
-require "../result"
+require "./result"
 
 module Crparse
-  class FailParser
+  class FailParser < Parser(Nil)
     def initialize(@message : String)
     end
 
@@ -10,7 +10,11 @@ module Crparse
     end
   end
 
-  class AnyParser
+  def eof
+    EOFParser.new
+  end
+
+  class AnyParser < Parser(Char)
     def run(state : State)
       if state.input.bytesize > state.pos
         ch = state.reader.current_char
@@ -21,7 +25,11 @@ module Crparse
     end
   end
 
-  class EOFParser
+  def any
+    AnyParser.new
+  end
+
+  class EOFParser < Parser(Nil)
     def run(state : State)
       if state.input.bytesize == state.pos
         Success.new(nil, state)
@@ -31,7 +39,7 @@ module Crparse
     end
   end
 
-  class CharParser
+  class CharParser < Parser(Char)
     def initialize(@needle : Char)
     end
 
@@ -44,7 +52,11 @@ module Crparse
     end
   end
 
-  class StringParser
+  def char(ch)
+    CharParser.new(ch)
+  end
+
+  class StringParser < Parser(String)
     def initialize(@needle : String)
     end
 
@@ -55,5 +67,9 @@ module Crparse
         Failure.new("expected #{@needle.inspect}")
       end
     end
+  end
+
+  def string(str)
+    StringParser.new(str)
   end
 end
