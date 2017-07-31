@@ -1,6 +1,7 @@
-require "./result"
+require "../result"
+require "../parser"
 
-module Crparse
+module Crparse::Parsers
   class FailParser < Parser(Nil)
     def initialize(@message : String)
     end
@@ -8,10 +9,6 @@ module Crparse
     def run(state : State)
       Failure.new(@message)
     end
-  end
-
-  def eof
-    EOFParser.new
   end
 
   class AnyParser < Parser(Char)
@@ -25,7 +22,7 @@ module Crparse
     end
   end
 
-  def any
+  def self.any
     AnyParser.new
   end
 
@@ -37,6 +34,10 @@ module Crparse
         Failure.new("expected EOF")
       end
     end
+  end
+
+  def self.eof
+    EOFParser.new
   end
 
   class CharParser < Parser(Char)
@@ -52,7 +53,7 @@ module Crparse
     end
   end
 
-  def char(ch)
+  def self.char(ch)
     CharParser.new(ch)
   end
 
@@ -69,7 +70,7 @@ module Crparse
     end
   end
 
-  def string(str)
+  def self.string(str)
     StringParser.new(str)
   end
 end
