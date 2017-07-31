@@ -102,6 +102,22 @@ describe Crparse::Parser do
     end
   end
 
+  describe "#option" do
+    it "works to parse the attribute" do
+      parser = Crparse.string("abc").option
+      result = parser.run("abcdef").as(Crparse::Success)
+      result.attribute.should eq "abc"
+      result.state.string.should eq "def"
+    end
+
+    it "works even if the attribute does not match the given input" do
+      parser = Crparse.string("abc").option
+      result = parser.run("def").as(Crparse::Success)
+      result.attribute.should be_nil
+      result.state.string.should eq "def"
+    end
+  end
+
   describe "#many" do
     it "parses sequence of given parser" do
       parser = Crparse.char('a').many

@@ -51,6 +51,20 @@ module Crparse
     end
   end
 
+  class OptionParser(T) < Parser(T?)
+    def initialize(@parser : Parser(T))
+    end
+
+    def run(state : State) : Success(T?) | Failure
+      case result = @parser.run(state)
+      when Success
+        Success(T?).new(result.attribute, result.state)
+      else
+        Success(T?).new(nil, state)
+      end
+    end
+  end
+
   class ManyParser(T) < Parser(Array(T))
     def initialize(@parser : Parser(T))
     end
@@ -94,6 +108,10 @@ module Crparse
 
     def |(r)
       OrParser.new(self, r)
+    end
+
+    def option
+      OptionParser.new(self)
     end
 
     def many
