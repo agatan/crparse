@@ -119,4 +119,27 @@ module Crparse::Parsers
   def position
     PositionParser.new
   end
+
+  class LazyParser(T) < Parser(T)
+    @parser : Parser(T)?
+
+    def initialize(@proc : Proc(Parser(T)))
+    end
+
+    def parser
+      @parser ||= @proc.call
+    end
+
+    def run(state : State)
+      parser.run(state)
+    end
+  end
+
+  def lazy(proc)
+    LazyParser.new(proc)
+  end
+
+  def lazy(type : T.class, &block : Proc(Parser(T))) forall T
+    LazyParser.new(block)
+  end
 end
