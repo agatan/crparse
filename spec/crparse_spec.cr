@@ -5,40 +5,39 @@ Parsers = Crparse::Parsers
 describe Crparse::Parsers do
   describe "fail" do
     it "always fails with the given message" do
-      result = Parsers.fail(Char, "failure message").run("").as(Crparse::Failure)
-      result.message.should eq "failure message"
+      Parsers.fail(Char, "failure message").run("").should be_a Crparse::Failure
     end
   end
   describe "any" do
     it "success to parse any character" do
       parser = Parsers.any
-      result = Crparse.run(parser, "abc").as(Crparse::Success)
+      result = Crparse.run(parser, "abc").success!
       result.attribute.should eq 'a'
       result.state.string.should eq "bc"
     end
 
     it "fails if no input given" do
       parser = Parsers.any
-      Crparse.run(parser, "").as(Crparse::Failure)
+      Crparse.run(parser, "").should be_a Crparse::Failure
     end
   end
 
   describe "eof" do
     it "successes if the given input is empty" do
       parser = Parsers.eof
-      Crparse.run(parser, "").as(Crparse::Success)
+      Crparse.run(parser, "").success!
     end
 
     it "fails if the given input is not empty" do
       parser = Parsers.eof
-      Crparse.run(parser, "abc").as(Crparse::Failure)
+      Crparse.run(parser, "abc").should be_a Crparse::Failure
     end
   end
 
   describe "char" do
     it "success to parse string" do
       parser = Parsers.char('a')
-      result = Crparse.run(parser, "abcdef").as(Crparse::Success)
+      result = Crparse.run(parser, "abcdef").success!
       result.attribute.should eq 'a'
       result.state.string.should eq "bcdef"
     end
@@ -47,7 +46,7 @@ describe Crparse::Parsers do
   describe "string" do
     it "success to parse string" do
       parser = Parsers.string("abc")
-      result = Crparse.run(parser, "abcdef").as(Crparse::Success)
+      result = Crparse.run(parser, "abcdef").success!
       result.attribute.should eq "abc"
       result.state.string.should eq "def"
     end
@@ -55,7 +54,7 @@ describe Crparse::Parsers do
 
   describe "range" do
     it "works with digit range" do
-      result = Parsers.range('0'..'9').run("123").as(Crparse::Success)
+      result = Parsers.range('0'..'9').run("123").success!
       result.attribute.should eq '1'
       result.state.string.should eq "23"
     end
@@ -64,7 +63,7 @@ describe Crparse::Parsers do
   describe "seq" do
     it "parses 3 parsers and produce a tuple of 3 attributes" do
       parser = Parsers.seq(Parsers.char('a'), Parsers.char('b').map { 2 }, Parsers.char('c'))
-      result = Crparse.run(parser, "abcdef").as(Crparse::Success)
+      result = Crparse.run(parser, "abcdef").success!
       result.attribute.should eq ({'a', 2, 'c'})
       result.state.string.should eq "def"
     end
@@ -72,7 +71,7 @@ describe Crparse::Parsers do
 
   describe "value" do
     it "always returns the given value" do
-      result = Parsers.value(1).run("abc").as(Crparse::Success)
+      result = Parsers.value(1).run("abc").success!
       result.attribute.should eq 1
       result.state.string.should eq "abc"
     end
@@ -80,11 +79,11 @@ describe Crparse::Parsers do
 
   describe "position" do
     it "returns the position of current state" do
-      result = Parsers.position.run("abc").as(Crparse::Success)
+      result = Parsers.position.run("abc").success!
       result.attribute.should eq Crparse::Position.new
       result.state.string.should eq "abc"
 
-      result = Parsers.seq(Parsers.string("abc"), Parsers.position).run("abcdef").as(Crparse::Success)
+      result = Parsers.seq(Parsers.string("abc"), Parsers.position).run("abcdef").success!
       result.attribute.should eq ({"abc", Crparse::Position.new(nil, 3, 1, 4)})
       result.state.string.should eq "def"
     end
@@ -95,7 +94,7 @@ describe Crparse::Parser do
   describe "#+" do
     it "combine two parsers" do
       parser = Parsers.string("abc") + Parsers.string("def")
-      result = parser.run("abcdef").as(Crparse::Success)
+      result = parser.run("abcdef").success!
       result.attribute.should eq ({"abc", "def"})
       result.state.string.should eq ""
     end
@@ -104,7 +103,7 @@ describe Crparse::Parser do
   describe "#<<" do
     it "discards right hand side attribute" do
       parser = Parsers.string("abc") << Parsers.string("def")
-      result = parser.run("abcdef").as(Crparse::Success)
+      result = parser.run("abcdef").success!
       result.attribute.should eq "abc"
       result.state.string.should eq ""
     end
@@ -113,7 +112,7 @@ describe Crparse::Parser do
   describe "#>>" do
     it "discards right hand side attribute" do
       parser = Parsers.string("abc") >> Parsers.string("def")
-      result = parser.run("abcdef").as(Crparse::Success)
+      result = parser.run("abcdef").success!
       result.attribute.should eq "def"
       result.state.string.should eq ""
     end
@@ -122,10 +121,10 @@ describe Crparse::Parser do
   describe "#|" do
     it "works as `or` parser" do
       parser = Parsers.string("abc") | Parsers.string("def")
-      result = parser.run("abcdef").as(Crparse::Success)
+      result = parser.run("abcdef").success!
       result.attribute.should eq "abc"
       result.state.string.should eq "def"
-      result = parser.run("defghi").as(Crparse::Success)
+      result = parser.run("defghi").success!
       result.attribute.should eq "def"
       result.state.string.should eq "ghi"
     end
@@ -134,14 +133,14 @@ describe Crparse::Parser do
   describe "#option" do
     it "works to parse the attribute" do
       parser = Parsers.string("abc").option
-      result = parser.run("abcdef").as(Crparse::Success)
+      result = parser.run("abcdef").success!
       result.attribute.should eq "abc"
       result.state.string.should eq "def"
     end
 
     it "works even if the attribute does not match the given input" do
       parser = Parsers.string("abc").option
-      result = parser.run("def").as(Crparse::Success)
+      result = parser.run("def").success!
       result.attribute.should be_nil
       result.state.string.should eq "def"
     end
@@ -150,10 +149,10 @@ describe Crparse::Parser do
   describe "#many" do
     it "parses sequence of given parser" do
       parser = Parsers.char('a').many
-      result = parser.run("aaaa").as(Crparse::Success)
+      result = parser.run("aaaa").success!
       result.attribute.should eq (['a'] * 4)
       result.state.string.should eq ""
-      result = parser.run("").as(Crparse::Success)
+      result = parser.run("").success!
       result.attribute.size.should eq 0
     end
   end
@@ -161,14 +160,14 @@ describe Crparse::Parser do
   describe "#many1" do
     it "parses sequence of given parser" do
       parser = Parsers.char('a').many1
-      result = parser.run("aaaa").as(Crparse::Success)
+      result = parser.run("aaaa").success!
       result.attribute.should eq (['a'] * 4)
       result.state.string.should eq ""
     end
 
     it "fails if no attributes match the parser" do
       parser = Parsers.char('a').many1
-      parser.run("").as(Crparse::Failure)
+      parser.run("").should be_a Crparse::Failure
     end
   end
 
